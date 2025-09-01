@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -9,6 +10,7 @@ typedef struct SObject{
 } TObject;
 
 char map[mapHeight][mapWidth+1];
+TObject mario;
 
 void ClearMap(){
     for(int i = 0; i<mapWidth; i++){
@@ -26,6 +28,16 @@ void ShowMap(){
         printf("%s",map[j]);
     }
 }
+
+void SetObjectPos(TObject *obj, float xPos, float yPos){
+	(*obj).x = xPos;
+	(*obj).y = yPos;
+}
+
+void PutObjectOnMap(TObject obj){
+	int ix = (int)round(obj.x);
+	int iy = (int)round(obj.y);
+	map[iy][ix] = '@';
 
 int main(){
     ClearMap();

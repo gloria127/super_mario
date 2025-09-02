@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <windows.h>
 
 #define mapWidth 80
 #define mapHeight 25
@@ -37,7 +38,7 @@ void SetObjectPos(TObject *obj, float xPos, float yPos){
 
 void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeight){
 	SetObjectPos(obj, xPos, yPos);
-	(*obj).width = o.Width;
+	(*obj).width = oWidth;
 	(*obj).height = oHeight;
 }
 
@@ -51,8 +52,27 @@ void PutObjectOnMap(TObject obj){
 		for (int j = iy; j < (iy + iHeight); j++){
 			map[j][i] = '@';
 	map[iy][ix] = '@';
+		}
+	}
+}
+void setCur(int x, int y){
+	COORD coord;
+	coord.X = x;
+	coord.Y = y;
+	SetConsoleCursorPOsition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
 
 int main(){
+	InitObject (&mario, 39, 10, 3, 3);
+	
+	do{
+		ClearMap();
+		PutObjectOnMap(mario);
+		
+		setCur(0,0);
+		ShowMap();
+	}
+	while (GetKeyState(VK_ESCAPE) >= 0);
 	SetObjectPos(mario, 20,10);   
     ClearMap();
 	PutObjectOnMap(mario);

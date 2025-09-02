@@ -9,6 +9,7 @@
 typedef struct SObject{
 	float x,y;
 	float width, height;
+	float vertSpeed;
 } TObject;
 
 char map[mapHeight][mapWidth+1];
@@ -40,6 +41,7 @@ void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
 	SetObjectPos(obj, xPos, yPos);
 	(*obj).width = oWidth;
 	(*obj).height = oHeight;
+	(*obj).vertSpeed = 0;
 }
 
 void PutObjectOnMap(TObject obj){
@@ -59,7 +61,7 @@ void setCur(int x, int y){
 	COORD coord;
 	coord.X = x;
 	coord.Y = y;
-	SetConsoleCursorPOsition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
 int main(){
@@ -73,7 +75,7 @@ int main(){
 		ShowMap();
 	}
 	while (GetKeyState(VK_ESCAPE) >= 0);
-	SetObjectPos(mario, 20,10);   
+	SetObjectPos(&mario, 20,10);   
     ClearMap();
 	PutObjectOnMap(mario);
     ShowMap();

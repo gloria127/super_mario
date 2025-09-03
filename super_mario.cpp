@@ -44,6 +44,11 @@ void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
 	(*obj).vertSpeed = 0;
 }
 
+void VertMoveObject (TObject *obj){
+	(*obj).vertSpeed +=0.05;
+	SetObjectPos(obj, (*obj).x, (*obj).y +(*obj).vertSpeed);
+}
+
 void PutObjectOnMap(TObject obj){
 	int ix = (int)round(obj.x);
 	int iy = (int)round(obj.y);
@@ -69,10 +74,13 @@ int main(){
 	
 	do{
 		ClearMap();
+		VertMoveObject(&mario);
 		PutObjectOnMap(mario);
 		
 		setCur(0,0);
 		ShowMap();
+		
+		Sleep(10);
 	}
 	while (GetKeyState(VK_ESCAPE) >= 0);
 	SetObjectPos(&mario, 20,10);   

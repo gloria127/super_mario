@@ -14,6 +14,7 @@ typedef struct SObject{
 
 char map[mapHeight][mapWidth+1];
 TObject mario;
+TObject brick[1];
 
 void ClearMap(){
     for(int i = 0; i<mapWidth; i++){
@@ -49,6 +50,10 @@ void VertMoveObject (TObject *obj){
 	SetObjectPos(obj, (*obj).x, (*obj).y +(*obj).vertSpeed);
 }
 
+BOOL IsPosInMap(int x, int y){
+	return ( (x >= 0) && (x < mapWidth) && (y >= 0) && (y < mapHeight) );
+}
+
 void PutObjectOnMap(TObject obj){
 	int ix = (int)round(obj.x);
 	int iy = (int)round(obj.y);
@@ -57,8 +62,10 @@ void PutObjectOnMap(TObject obj){
 	
 	for (int i = ix; i < (ix + iWidth); i++){
 		for (int j = iy; j < (iy + iHeight); j++){
-			map[j][i] = '@';
-	map[iy][ix] = '@';
+			if (IsPosInMap(i,j)){
+				map[j][i] = '@';
+			}
+	//map[iy][ix] = '@';
 		}
 	}
 }
@@ -71,10 +78,11 @@ void setCur(int x, int y){
 
 int main(){
 	InitObject (&mario, 39, 10, 3, 3);
-	
+	InitObject (brick, 20, 20, 40, 5);
 	do{
 		ClearMap();
 		VertMoveObject(&mario);
+		PutObjectOnMap(brick[0]);
 		PutObjectOnMap(mario);
 		
 		setCur(0,0);

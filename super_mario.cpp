@@ -10,6 +10,7 @@ typedef struct SObject{
 	float x,y;
 	float width, height;
 	float vertSpeed;
+	BOOL IsFly;
 } TObject;
 
 char map[mapHeight][mapWidth+1];
@@ -45,14 +46,17 @@ void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
 	(*obj).vertSpeed = 0;
 }
 
-BOOL IsCollision(TObject o1, TObject o2)
+BOOL IsCollision(TObject o1, TObject o2);
 
 void VertMoveObject (TObject *obj){
-	(*obj).vertSpeed +=0.05;
-	SetObjectPos(obj, (*obj).x, (*obj).y +(*obj).vertSpeed);
+	(*obj).IsFly = TRUE;
+	(*obj).vertSpeed += 0.05;
+	SetObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
 	if (IsCollision( *obj, brick[0])){
 		(*obj).y -= ( *obj).vertSpeed;
 		(*obj).vertSpeed = 0;
+		(*obj).IsFly = FALSE;
+	}
 }
 
 BOOL IsPosInMap(int x, int y){
@@ -86,11 +90,28 @@ BOOL IsCollision(TObject o1, TObject o2){
 			  ((o1.y + o1.height)) && (o1.y < (o2.y + o2.height)); 
 }
 
+/* void hide_cursor(){
+	void* handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_CURSOR_INFO structCursorInfo;
+	GetConsoleCursorInfo(handle, &structCursorInfo);
+	structCursorInfo.bVisible = FALSE;
+	SetConsoleCursorInfo(handle, &structCursorInfo);
+}*/
+
 int main(){
+	
+//	hide_cursor();
+//	CreateLevel(level);
+	
 	InitObject (&mario, 39, 10, 3, 3);
 	InitObject (brick, 20, 20, 40, 5);
 	do{
 		ClearMap();
+		
+		if ((mario.IsFly == FALSE) && (GetKeyState(VK_SPACE) < 0)) {
+			mario.vertSpeed = -1;
+		}
+		
 		VertMoveObject(&mario);
 		PutObjectOnMap(brick[0]);
 		PutObjectOnMap(mario);

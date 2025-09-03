@@ -85,6 +85,10 @@ void setCur(int x, int y){
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
+void HorizonMoveMap(float dx){
+		brick[0].x +=dx;
+}
+
 BOOL IsCollision(TObject o1, TObject o2){
 		return((o1.x + o1.width)> o2.x) && (o1.x < (o2.x + o2.width)) &&
 			  ((o1.y + o1.height)) && (o1.y < (o2.y + o2.height)); 
@@ -110,6 +114,12 @@ int main(){
 		
 		if ((mario.IsFly == FALSE) && (GetKeyState(VK_SPACE) < 0)) {
 			mario.vertSpeed = -1;
+		}
+		if (GetKeyState('A') < 0){
+				HorizonMoveMap(1);
+		}
+		if (GetKeyState('D') < 0){
+				HorizonMoveMap(-1);
 		}
 		
 		VertMoveObject(&mario);

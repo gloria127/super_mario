@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <windows.h>
 
-#define mapWidth 80
-#define mapHeight 25
+#define mapWidth 120
+#define mapHeight 30
 
 typedef struct SObject{
 	float x,y;
@@ -15,7 +15,8 @@ typedef struct SObject{
 
 char map[mapHeight][mapWidth+1];
 TObject mario;
-TObject brick[1];
+TObject *brick = NULL;
+int brickLength;
 
 void ClearMap(){
     for(int i = 0; i<mapWidth; i++){
@@ -86,7 +87,9 @@ void setCur(int x, int y){
 }
 
 void HorizonMoveMap(float dx){
-		brick[0].x +=dx;
+		for (int i = 0; i < brickLength; i++){
+			brick[i].x += dx;
+		}
 }
 
 BOOL IsCollision(TObject o1, TObject o2){
@@ -94,21 +97,31 @@ BOOL IsCollision(TObject o1, TObject o2){
 			  ((o1.y + o1.height)) && (o1.y < (o2.y + o2.height)); 
 }
 
-/* void hide_cursor(){
+void CreateLevel(){
+		InitObject(&mario, 39, 10, 3, 3);
+		
+		brickLength = 5;
+		brick = (TObject*)malloc( sizeof(*brick) * brickLength );
+		InitObject(brick+0, 20, 20, 40, 5);
+		InitObject(brick+1, 60, 15, 10, 10);
+		InitObject(brick+2, 80, 20, 20, 5);
+		InitObject(brick+3, 120, 15, 10, 10);
+		InitObject(brick+4, 150, 20, 40, 5);
+}
+void hide_cursor(){
 	void* handle = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO structCursorInfo;
 	GetConsoleCursorInfo(handle, &structCursorInfo);
 	structCursorInfo.bVisible = FALSE;
 	SetConsoleCursorInfo(handle, &structCursorInfo);
-}*/
+}
 
 int main(){
 	
-//	hide_cursor();
-//	CreateLevel(level);
+	hide_cursor();
+	CreateLevel();
 	
-	InitObject (&mario, 39, 10, 3, 3);
-	InitObject (brick, 20, 20, 40, 5);
+	
 	do{
 		ClearMap();
 		
@@ -123,7 +136,9 @@ int main(){
 		}
 		
 		VertMoveObject(&mario);
-		PutObjectOnMap(brick[0]);
+		for ( int i = 0; i <  brickLength; i++){
+			PutObjectOnMap(brick[i]);
+		}
 		PutObjectOnMap(mario);
 		
 		setCur(0,0);

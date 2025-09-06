@@ -145,6 +145,10 @@ int main(){
 				HorizonMoveMap(-1);
 		}
 		
+		if (mario.y > mapHeight) {
+			CreateLevel();
+		}
+		
 		VertMoveObject(&mario);
 		for ( int i = 0; i <  brickLength; i++){
 			PutObjectOnMap(brick[i]);
@@ -154,7 +158,7 @@ int main(){
 		setCur(0,0);
 		ShowMap();
 		
-		//Sleep(10);
+		Sleep(10);
 	}
 	while (GetKeyState(VK_ESCAPE) >= 0);
 	SetObjectPos(&mario, 20,10);   

@@ -47,19 +47,25 @@ void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
 	(*obj).vertSpeed = 0;
 }
 
-BOOL IsCollision(TObject o1, TObject o2);
+BOOL IsCollision(TObject o1, TObject o2){
+	return ((o1.x + o1.width) > o2.x) && (o1.x < (o2.x + o2.width)) &&
+		   ((o1.y + o1.height) >o2.y) && (o1.y < (o2.y + o2.height));
+}	
 
 void VertMoveObject (TObject *obj){
 	(*obj).IsFly = TRUE;
 	(*obj).vertSpeed += 0.05;
 	SetObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
-	if (IsCollision( *obj, brick[0])){
-		(*obj).y -= ( *obj).vertSpeed;
-		(*obj).vertSpeed = 0;
-		(*obj).IsFly = FALSE;
+	
+	for (int i = 0; i < brickLength; i++){
+		if (IsCollision( *obj, brick[i])){
+			(*obj).y -= ( *obj).vertSpeed;
+			(*obj).vertSpeed = 0;
+			(*obj).IsFly = FALSE;
+			break;
+		}
 	}
 }
-
 BOOL IsPosInMap(int x, int y){
 	return ( (x >= 0) && (x < mapWidth) && (y >= 0) && (y < mapHeight) );
 }
@@ -87,14 +93,18 @@ void setCur(int x, int y){
 }
 
 void HorizonMoveMap(float dx){
-		for (int i = 0; i < brickLength; i++){
-			brick[i].x += dx;
+	mario.x -= dx;
+	for (int i = 0; i < brickLength; i++){
+		if (IsCollision(mario, brick[i])){
+			mario.x += dx;
+			return;
 		}
-}
-
-BOOL IsCollision(TObject o1, TObject o2){
-		return((o1.x + o1.width)> o2.x) && (o1.x < (o2.x + o2.width)) &&
-			  ((o1.y + o1.height)) && (o1.y < (o2.y + o2.height)); 
+	}
+	mario.x += dx;
+	
+	for (int i = 0; i < brickLength; i++){
+		brick[i].x += dx;
+	}
 }
 
 void CreateLevel(){
@@ -144,7 +154,7 @@ int main(){
 		setCur(0,0);
 		ShowMap();
 		
-		Sleep(10);
+		//Sleep(10);
 	}
 	while (GetKeyState(VK_ESCAPE) >= 0);
 	SetObjectPos(&mario, 20,10);   

@@ -90,8 +90,10 @@ void VertMoveObject (TObject *obj){
 			(*obj).vertSpeed = 0;
 			(*obj).IsFly = FALSE;
 			if (brick[i].cType == '+'){
-				CreateLevel(level);
-				Sleep(1000);
+				if (level > 2) level =1;{
+					CreateLevel(level);
+					Sleep(1000);
+				}
 			}
 			break;
 		}

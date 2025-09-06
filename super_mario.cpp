@@ -54,6 +54,19 @@ BOOL IsCollision(TObject o1, TObject o2){
 		   ((o1.y + o1.height) >o2.y) && (o1.y < (o2.y + o2.height));
 }	
 
+void CreateLevel(){
+		InitObject(&mario, 39, 10, 3, 3, '@');
+		
+		brickLength = 6;
+		brick = (TObject*)realloc( brick, sizeof(*brick) * brickLength );
+		InitObject(brick+0, 20, 20, 40, 5, '#');
+		InitObject(brick+1, 60, 15, 10, 10, '#');
+		InitObject(brick+2, 80, 20, 20, 5, '#');
+		InitObject(brick+3, 120, 15, 10, 10, '#');
+		InitObject(brick+4, 150, 20, 40, 5, '#');
+		InitObject(brick+5, 210, 15, 10, 10, '+');
+}
+
 void VertMoveObject (TObject *obj){
 	(*obj).IsFly = TRUE;
 	(*obj).vertSpeed += 0.05;
@@ -64,6 +77,10 @@ void VertMoveObject (TObject *obj){
 			(*obj).y -= ( *obj).vertSpeed;
 			(*obj).vertSpeed = 0;
 			(*obj).IsFly = FALSE;
+			if (brick[i].cType == '+'){
+				CreateLevel();
+				Sleep(1000);
+			}
 			break;
 		}
 	}
@@ -109,17 +126,6 @@ void HorizonMoveMap(float dx){
 	}
 }
 
-void CreateLevel(){
-		InitObject(&mario, 39, 10, 3, 3, '@');
-		
-		brickLength = 5;
-		brick = (TObject*)realloc( brick, sizeof(*brick) * brickLength );
-		InitObject(brick+0, 20, 20, 40, 5, '#');
-		InitObject(brick+1, 60, 15, 10, 10, '#');
-		InitObject(brick+2, 80, 20, 20, 5, '#');
-		InitObject(brick+3, 120, 15, 10, 10, '#');
-		InitObject(brick+4, 150, 20, 40, 5, '#');
-}
 void hide_cursor(){
 	void* handle = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO structCursorInfo;

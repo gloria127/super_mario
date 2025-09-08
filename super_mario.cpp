@@ -16,9 +16,16 @@ typedef struct SObject{
 
 char map[mapHeight][mapWidth+1];
 TObject mario;
+
 TObject *brick = NULL;
 int brickLength;
+
+TObject *moving = NULL;
+int movingLength;
+
 int level =1;
+
+
 
 void ClearMap(){
     for(int i = 0; i<mapWidth; i++){
@@ -67,11 +74,14 @@ void CreateLevel(int level){
 			InitObject(brick+3, 120, 15, 10, 10, '#');
 			InitObject(brick+4, 150, 20, 40, 5, '#');
 			InitObject(brick+5, 210, 15, 10, 10, '+');
+			movingLength = 1;
+			moving =  (TObject*) realloc(moving, sizeof (*moving) * movingLength);
+			InitObject(moving+0, 25, 10, 3, 2, 'o');
 		}
 		
 		if (level == 2){
 			brickLength = 4;
-			brick = (TObject*)realloc( brick, sizeof(*brick) * brickLength );
+			brick = (TObject*) realloc( brick, sizeof(*brick) * brickLength );
 			InitObject(brick+0, 20, 20, 40, 5, '#');
 			InitObject(brick+1, 80, 20, 15, 5, '#');
 			InitObject(brick+2, 120, 15, 15, 10, '#');
@@ -81,7 +91,7 @@ void CreateLevel(int level){
 
 void VertMoveObject (TObject *obj){
 	(*obj).IsFly = TRUE;
-	(*obj).vertSpeed += 0.05;
+	(*obj).vertSpeed += 0.25;
 	SetObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
 	
 	for (int i = 0; i < brickLength; i++){
@@ -152,13 +162,14 @@ int main(){
 	
 	hide_cursor();
 	CreateLevel(level);
+	//system("color 9F");
 	
 	
 	do{
 		ClearMap();
 		
 		if ((mario.IsFly == FALSE) && (GetKeyState(VK_SPACE) < 0)) {
-			mario.vertSpeed = -1;
+			mario.vertSpeed = -2.0;
 		}
 		if (GetKeyState('A') < 0){
 				HorizonMoveMap(1);
@@ -174,6 +185,10 @@ int main(){
 		VertMoveObject(&mario);
 		for ( int i = 0; i <  brickLength; i++){
 			PutObjectOnMap(brick[i]);
+		}
+		for ( int i = 0; i <  movingLength; i++){
+			VertMoveObject (moving + i);
+			PutObjectOnMap(moving[i]);
 		}
 		PutObjectOnMap(mario);
 		

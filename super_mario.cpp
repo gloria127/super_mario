@@ -111,6 +111,11 @@ void VertMoveObject (TObject *obj){
 		}
 	}
 }
+void DeletedMoving(int i){
+	movingLength--;
+	moving[i] = moving[movingLength];
+	moving = (TObject*) realloc( moving, sizeof(*moving) * movingLength );
+}
 
 void MarioCollision(){
 	for (int i = 0; i < movingLength; i++){

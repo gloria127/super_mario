@@ -64,21 +64,37 @@ BOOL IsCollision(TObject o1, TObject o2){
 		   ((o1.y + o1.height) >o2.y) && (o1.y < (o2.y + o2.height));
 }	
 
+TObject *GetNewBrick(){
+	brickLength++;
+	brick = (TObject*) realloc( brick, sizeof(TObject) * brickLength); //sizeof(brick) 
+	return brick + brickLength - 1;
+}
+
+TObject *GetNewMoving(){
+	movingLength++;
+	moving = (TObject*) realloc( moving, sizeof(TObject) * movingLength); //sizeof(brick)
+	return moving + movingLength - 1;
+}
+
 void CreateLevel(int level){
 		InitObject(&mario, 39, 10, 3, 3, '@');
 		
 		if (level == 1){
-			brickLength = 6;
+			brickLength = 0;
 			brick = (TObject*)realloc( brick, sizeof(*brick) * brickLength );
-			InitObject(brick+0, 20, 20, 40, 5, '#');
-			InitObject(brick+1, 60, 15, 10, 10, '#');
-			InitObject(brick+2, 80, 20, 20, 5, '#');
-			InitObject(brick+3, 120, 15, 10, 10, '#');
-			InitObject(brick+4, 150, 20, 40, 5, '#');
-			InitObject(brick+5, 210, 15, 10, 10, '+');
-			movingLength = 1;
-			moving =  (TObject*) realloc(moving, sizeof (*moving) * movingLength);
-			InitObject(moving+0, 25, 10, 3, 2, 'o');
+			InitObject(GetNewBrick(), 20, 20, 40, 5, '#');
+			InitObject(GetNewBrick(), 60, 15, 10, 10, '#');
+			InitObject(GetNewBrick(), 80, 20, 20, 5, '#');
+			InitObject(GetNewBrick(), 120, 15, 10, 10, '#');
+			InitObject(GetNewBrick(), 150, 20, 40, 5, '#');
+			InitObject(GetNewBrick(), 210, 15, 10, 10, '+');
+			movingLength = 0;
+			InitObject(GetNewMoving(), 25, 10, 3, 2, 'o');
+			InitObject(GetNewMoving(), 80, 10, 3, 2, 'o');
+			InitObject(GetNewMoving(), 65, 10, 3, 2, 'o');
+			InitObject(GetNewMoving(), 120, 10, 3, 2, 'o');
+			InitObject(GetNewMoving(), 160, 10, 3, 2, 'o');
+			InitObject(GetNewMoving(), 175, 10, 3, 2, 'o');
 		}
 		
 		if (level == 2){

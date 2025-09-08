@@ -113,7 +113,14 @@ void VertMoveObject (TObject *obj){
 }
 
 void HorizonMoveMapObject (TObject *obj){
-		obj[0].x += obj[0].horizSpeed;	
+	obj[0].x += obj[0].horizSpeed;	
+	for (int i = 0; i < brickLength; i++){
+		if ( IsCollision(obj[0], brick[i])){
+			obj[0].x -= obj[0].horizSpeed;
+			obj[0].horizSpeed = -obj[0].horizSpeed;
+			return;
+		}	
+	}	
 }
 
 BOOL IsPosInMap(int x, int y){

@@ -233,6 +233,11 @@ int main(){
 		for ( int i = 0; i <  movingLength; i++){
 			VertMoveObject (moving + i);
 			HorizonMoveMapObject (moving + i);
+			if (moving[i].y > mapHeight){
+				DeletedMoving(i);
+				i--;
+				continue;
+			}
 			PutObjectOnMap (moving[i]);
 		}
 		PutObjectOnMap(mario);

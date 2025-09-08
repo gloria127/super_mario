@@ -112,6 +112,14 @@ void VertMoveObject (TObject *obj){
 	}
 }
 
+void MarioCollision(){
+	for (int i = 0; i < movingLength; i++){
+		if (IsCollision (mario, moving[i])){
+			CreateLevel(level);
+		}
+	}	
+}
+
 void HorizonMoveMapObject (TObject *obj){
 	obj[0].x += obj[0].horizSpeed;	
 	for (int i = 0; i < brickLength; i++){
@@ -206,6 +214,8 @@ int main(){
 		}
 		
 		VertMoveObject(&mario);
+		MarioCollision();
+		
 		for ( int i = 0; i <  brickLength; i++){
 			PutObjectOnMap(brick[i]);
 		}

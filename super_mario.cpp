@@ -78,8 +78,19 @@ TObject *GetNewMoving(){
 
 void CreateLevel(int level){
 		InitObject(&mario, 39, 10, 3, 3, '@');
+		if (level == 2){
+			brickLength =0;
+			InitObject(GetNewBrick(), 20, 20, 40, 5, '#');
+				InitObject(GetNewBrick(), 30, 10, 5, 3, '?');
+				InitObject(GetNewBrick(), 50, 10, 5, 3, '?');
+			InitObject(GetNewBrick(), 60, 15, 10, 10, '#');
+			InitObject(GetNewBrick(), 100, 20, 20, 5, '#');
+			InitObject(GetNewBrick(), 120, 15, 10, 10, '#');
+			InitObject(GetNewBrick(), 150, 20, 40, 5, '#');
+			InitObject(GetNewBrick(), 210, 15, 10, 10, '+');
+		}
 		
-		if (level == 1){
+		if (level == 2){
 			brickLength = 0;
 			brick = (TObject*)realloc( brick, sizeof(*brick) * brickLength );
 			InitObject(GetNewBrick(), 20, 20, 40, 5, '#');
@@ -97,13 +108,20 @@ void CreateLevel(int level){
 			InitObject(GetNewMoving(), 175, 10, 3, 2, 'o');
 		}
 		
-		if (level == 2){
+		if (level == 3){
 			brickLength = 4;
 			brick = (TObject*) realloc( brick, sizeof(*brick) * brickLength );
-			InitObject(brick+0, 20, 20, 40, 5, '#');
-			InitObject(brick+1, 80, 20, 15, 5, '#');
-			InitObject(brick+2, 120, 15, 15, 10, '#');
-			InitObject(brick+3, 160, 10, 15, 15, '#');
+			InitObject(GetNewBrick(), 20, 20, 40, 5, '#');
+			InitObject(GetNewBrick(), 80, 20, 15, 5, '#');
+			InitObject(GetNewBrick(), 120, 15, 15, 10, '#');
+			InitObject(GetNewBrick(), 160, 10, 15, 15, '#');
+			movingLength = 0;
+			InitObject(GetNewMoving(), 25, 10, 3, 2, 'o');
+			InitObject(GetNewMoving(), 50, 10, 3, 2, 'o');
+			InitObject(GetNewMoving(), 80, 10, 3, 2, 'o');
+			InitObject(GetNewMoving(), 90, 10, 3, 2, 'o');
+			InitObject(GetNewMoving(), 120, 10, 3, 2, 'o');
+			InitObject(GetNewMoving(), 130, 10, 3, 2, 'o');
 		}
 }
 
@@ -118,7 +136,7 @@ void VertMoveObject (TObject *obj){
 			(*obj).vertSpeed = 0;
 			(*obj).IsFly = FALSE;
 			if (brick[i].cType == '+'){
-				if (level > 2) level =1;{
+				if (level > 3) level =1;{
 					CreateLevel(level);
 					Sleep(1000);
 				}

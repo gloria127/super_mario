@@ -63,6 +63,11 @@ BOOL IsCollision(TObject o1, TObject o2){
 	return ((o1.x + o1.width) > o2.x) && (o1.x < (o2.x + o2.width)) &&
 		   ((o1.y + o1.height) >o2.y) && (o1.y < (o2.y + o2.height));
 }	
+TObject *GetNewMoving(){
+	movingLength++;
+	moving = (TObject*) realloc( moving, sizeof(TObject) * movingLength); //sizeof(brick)
+	return moving + movingLength - 1;
+}
 
 TObject *GetNewBrick(){
 	brickLength++;
@@ -70,15 +75,9 @@ TObject *GetNewBrick(){
 	return brick + brickLength - 1;
 }
 
-TObject *GetNewMoving(){
-	movingLength++;
-	moving = (TObject*) realloc( moving, sizeof(TObject) * movingLength); //sizeof(brick)
-	return moving + movingLength - 1;
-}
-
 void CreateLevel(int level){
 		InitObject(&mario, 39, 10, 3, 3, '@');
-		if (level == 2){
+		if (level == 1){
 			brickLength =0;
 			InitObject(GetNewBrick(), 20, 20, 40, 5, '#');
 				InitObject(GetNewBrick(), 30, 10, 5, 3, '?');
@@ -132,9 +131,16 @@ void VertMoveObject (TObject *obj){
 	
 	for (int i = 0; i < brickLength; i++){
 		if (IsCollision( *obj, brick[i])){
+			if (obj[0].vertSpeed > 0){
+				obj[0].IsFly = FALSE;
+			}
+			if ((brick[i].cType == '?') && (obj[0].vertSpeed < 0) && (obj == &mario)){
+				brick[i].cType = '-';
+				InitObject(GetNewMoving(), brick[i].x, brick[i].y-3, 3, 2, '$');
+			}
 			(*obj).y -= ( *obj).vertSpeed;
 			(*obj).vertSpeed = 0;
-			(*obj).IsFly = FALSE;
+
 			if (brick[i].cType == '+'){
 				if (level > 3) level =1;{
 					CreateLevel(level);

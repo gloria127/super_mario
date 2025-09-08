@@ -121,6 +121,12 @@ void HorizonMoveMapObject (TObject *obj){
 			return;
 		}	
 	}	
+	TObject tmp = *obj;
+	VertMoveObject(&tmp);
+	if (tmp.IsFly == TRUE){
+		obj[0].x -= obj[0].horizSpeed;
+		obj[0].horizSpeed = -obj[0].horizSpeed;		
+	}	
 }
 
 BOOL IsPosInMap(int x, int y){

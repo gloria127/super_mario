@@ -111,6 +111,11 @@ void VertMoveObject (TObject *obj){
 		}
 	}
 }
+
+void HorizonMoveMapObject (TObject *obj){
+		obj[0].x += obj[0].horizSpeed;	
+}
+
 BOOL IsPosInMap(int x, int y){
 	return ( (x >= 0) && (x < mapWidth) && (y >= 0) && (y < mapHeight) );
 }
@@ -194,7 +199,8 @@ int main(){
 		
 		for ( int i = 0; i <  movingLength; i++){
 			VertMoveObject (moving + i);
-			PutObjectOnMap(moving[i]);
+			HorizonMoveMapObject (moving + i);
+			PutObjectOnMap (moving[i]);
 		}
 		PutObjectOnMap(mario);
 		

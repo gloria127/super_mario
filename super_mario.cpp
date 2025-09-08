@@ -110,6 +110,7 @@ void CreateLevel(int level){
 		InitObject(GetNewMoving(), 175, 10, 3, 2, 'o');
 	}
 		
+		
 	if (level == 3){
 		brick = (TObject*) realloc( brick, sizeof(*brick) * brickLength );
 		InitObject(GetNewBrick(), 20, 20, 40, 5, '#');

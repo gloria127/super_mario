@@ -26,6 +26,7 @@ int movingLength;
 
 int level =1;
 int score;
+int maxLevel;
 
 void CreateLevel(int level);
 
@@ -147,6 +148,7 @@ void CreateLevel(int level){
 		InitObject(GetNewMoving(), 120, 10, 3, 2, 'o');
 		InitObject(GetNewMoving(), 130, 10, 3, 2, 'o');
 	}
+	maxLevel = 3;
 }
 
 
@@ -170,7 +172,7 @@ void VertMoveObject (TObject *obj){
 			(*obj).vertSpeed = 0;
 
 			if (brick[i].cType == '+'){
-				if (level > 3){
+				if (level > maxLevel){
 					level =1;
 					system("color 2F");
 					Sleep(500);

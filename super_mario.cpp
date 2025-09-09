@@ -76,6 +76,8 @@ TObject *GetNewBrick(){
 }
 
 void CreateLevel(int level){
+	system("color 9F");
+	
 	brickLength = 0;
 	brick = (TObject*) realloc( brick,0);
 	movingLength = 0;
@@ -153,9 +155,11 @@ void VertMoveObject (TObject *obj){
 			(*obj).vertSpeed = 0;
 
 			if (brick[i].cType == '+'){
-				if (level > 3) level =1;{
+				if (level > 3){
+					level =1;
+					system("color 2F");
+					Sleep(500);
 					CreateLevel(level);
-					Sleep(1000);
 				}
 			}
 			break;

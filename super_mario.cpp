@@ -26,7 +26,7 @@ int movingLength;
 
 int level =1;
 
-
+void CreateLevel(int level);
 
 void ClearMap(){
     for(int i = 0; i<mapWidth; i++){
@@ -137,6 +137,8 @@ void CreateLevel(int level){
 	}
 }
 
+
+
 void VertMoveObject (TObject *obj){
 	(*obj).IsFly = TRUE;
 	(*obj).vertSpeed += 0.25;
@@ -166,10 +168,17 @@ void VertMoveObject (TObject *obj){
 		}
 	}
 }
+
 void DeletedMoving(int i){
 	movingLength--;
 	moving[i] = moving[movingLength];
 	moving = (TObject*) realloc( moving, sizeof(*moving) * movingLength );
+}
+
+void PlayerDead(){
+    system("color 4F");
+    Sleep(500);
+    CreateLevel(level);   // теперь компилятор знает про CreateLevel
 }
 
 void MarioCollision(){
@@ -181,7 +190,7 @@ void MarioCollision(){
 					i--;
 					continue;
 				}else 
-					CreateLevel(level);
+					PlayerDead();
 			}
 			if (moving[i].cType == '$'){
 				DeletedMoving(i);
@@ -284,7 +293,7 @@ int main(){
 		}
 		
 		if (mario.y > mapHeight) {
-			CreateLevel(level);
+			PlayerDead();
 		}
 		
 		VertMoveObject(&mario);

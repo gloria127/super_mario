@@ -10,9 +10,9 @@ typedef struct SObject{
 	float x,y;
 	float width, height;
 	float vertSpeed;
+	float horizSpeed;
 	bool isFly;
 	char cType;
-	float horizSpeed;
 } TObject;
 
 char map[mapHeight][mapWidth+1];
@@ -32,17 +32,17 @@ int maxLevel;
 
 void setCur(int x, int y);
 void hide_cursor();
-void ClearMap();
-void ShowMap();
-void PutObjectOnMap();
-void PutObjectOnMap(TObject obj);
-void SetObjectPos(TObject *obj, float xPos, float yPos);
-void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeight, char inType);
-void PlayerDead();
-void CreateLevel(int level);
-void VertMoveObject (TObject *obj);
-void DeletedMoving(int i);
-void MarioCollision();
+void clearMap();
+void showMap();
+void putObjectOnMap();
+void putObjectOnMap(TObject obj);
+void setObjectPos(TObject *obj, float xPos, float yPos);
+void initObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeight, char inType);
+void playerDead();
+void createLevel(int level);
+void vertMoveObject (TObject *obj);
+void deletedMoving(int i);
+void marioCollision();
 
 bool IsPosInMap(int x, int y);
 bool IsCollision(TObject o1, TObject o2);
@@ -62,7 +62,7 @@ void hide_cursor(){
 	SetConsoleCursorInfo(handle, &structCursorInfo);
 }
 
-void ClearMap(){
+void clearMap(){
     for(int i = 0; i<mapWidth; i++){
         map[0][i] = ' ';
     }
@@ -72,14 +72,14 @@ void ClearMap(){
     }
 }
 
-void ShowMap(){
+void showMap(){
     map[mapHeight-1][mapWidth-1]='\0';
     for (int j=0; j<mapHeight; j++){
         printf("%s",map[j]);
     }
 }
 
-void PutObjectOnMap(){
+void putObjectOnMap(){
 	char c[30];
 	sprintf(c, "score: %d", score);
 	int len = strlen(c);
@@ -88,7 +88,7 @@ void PutObjectOnMap(){
 	}
 }
 
-void PutObjectOnMap(TObject obj){
+void putObjectOnMap(TObject obj){
 	int ix = (int)round(obj.x);
 	int iy = (int)round(obj.y);
 	int iWidth = (int)round(obj.width);
@@ -104,13 +104,13 @@ void PutObjectOnMap(TObject obj){
 	}
 }
 
-void SetObjectPos(TObject *obj, float xPos, float yPos){
+void setObjectPos(TObject *obj, float xPos, float yPos){
 	(*obj).x = xPos;
 	(*obj).y = yPos;
 }
 
-void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeight, char inType){
-	SetObjectPos(obj, xPos, yPos);
+void initObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeight, char inType){
+	setObjectPos(obj, xPos, yPos);
 	(*obj).width = oWidth;
 	(*obj).height = oHeight;
 	(*obj).vertSpeed = 0;
@@ -118,13 +118,13 @@ void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
 	(*obj).horizSpeed = 0.2;
 }
 
-void PlayerDead(){
+void playerDead(){
     system("color 4F");
     Sleep(500);
-    CreateLevel(level);   // теперь компилятор знает про CreateLevel
+    createLevel(level);   // теперь компилятор знает про createLevel
 }
 
-void CreateLevel(int level){
+void createLevel(int level){
 	system("color 9F");
 	
 	brickLength = 0;
@@ -132,67 +132,67 @@ void CreateLevel(int level){
 	movingLength = 0;
 	moving = (TObject*) realloc( moving, 0);
 	
-	InitObject(&mario, 39, 10, 3, 3, '@');
+	initObject(&mario, 39, 10, 3, 3, '@');
 	score = 0;
 	
 	if (level == 1){
-		InitObject(GetNewBrick(), 20, 20, 40, 5, '#');
-			InitObject(GetNewBrick(), 30, 10, 5, 3, '?');
-			InitObject(GetNewBrick(), 50, 10, 5, 3, '?');
-		InitObject(GetNewBrick(), 60, 15, 40, 10, '#');
-			InitObject(GetNewBrick(), 60, 5, 10, 3, '-');
-			InitObject(GetNewBrick(), 70, 5, 5, 3, '?');
-			InitObject(GetNewBrick(), 75, 5, 5, 3, '-');
-			InitObject(GetNewBrick(), 80, 5, 5, 3, '?');
-			InitObject(GetNewBrick(), 85, 5, 10, 3, '-');
-		InitObject(GetNewBrick(), 100, 20, 20, 5, '#');
-		InitObject(GetNewBrick(), 120, 15, 10, 10, '#');
-		InitObject(GetNewBrick(), 150, 20, 40, 5, '#');
-		InitObject(GetNewBrick(), 210, 15, 10, 10, '+');
+		initObject(GetNewBrick(), 20, 20, 40, 5, '#');
+			initObject(GetNewBrick(), 30, 10, 5, 3, '?');
+			initObject(GetNewBrick(), 50, 10, 5, 3, '?');
+		initObject(GetNewBrick(), 60, 15, 40, 10, '#');
+			initObject(GetNewBrick(), 60, 5, 10, 3, '-');
+			initObject(GetNewBrick(), 70, 5, 5, 3, '?');
+			initObject(GetNewBrick(), 75, 5, 5, 3, '-');
+			initObject(GetNewBrick(), 80, 5, 5, 3, '?');
+			initObject(GetNewBrick(), 85, 5, 10, 3, '-');
+		initObject(GetNewBrick(), 100, 20, 20, 5, '#');
+		initObject(GetNewBrick(), 120, 15, 10, 10, '#');
+		initObject(GetNewBrick(), 150, 20, 40, 5, '#');
+		initObject(GetNewBrick(), 210, 15, 10, 10, '+');
 		
-		InitObject(GetNewMoving(), 25, 10, 3, 2, 'o');
-		InitObject(GetNewMoving(), 80, 10, 3, 2, 'o');
+		initObject(GetNewMoving(), 25, 10, 3, 2, 'o');
+		initObject(GetNewMoving(), 80, 10, 3, 2, 'o');
 	}
 		
 	if (level == 2){
 		brick = (TObject*)realloc( brick, sizeof(*brick) * brickLength );
-		InitObject(GetNewBrick(), 20, 20, 40, 5, '#');
-		InitObject(GetNewBrick(), 60, 15, 10, 10, '#');
-		InitObject(GetNewBrick(), 80, 20, 20, 5, '#');
-		InitObject(GetNewBrick(), 120, 15, 10, 10, '#');
-		InitObject(GetNewBrick(), 150, 20, 40, 5, '#');
-		InitObject(GetNewBrick(), 210, 15, 10, 10, '+');
+		initObject(GetNewBrick(), 20, 20, 40, 5, '#');
+		initObject(GetNewBrick(), 60, 15, 10, 10, '#');
+		initObject(GetNewBrick(), 80, 20, 20, 5, '#');
+		initObject(GetNewBrick(), 120, 15, 10, 10, '#');
+		initObject(GetNewBrick(), 150, 20, 40, 5, '#');
+		initObject(GetNewBrick(), 210, 15, 10, 10, '+');
 
-		InitObject(GetNewMoving(), 25, 10, 3, 2, 'o');
-		InitObject(GetNewMoving(), 80, 10, 3, 2, 'o');
-		InitObject(GetNewMoving(), 65, 10, 3, 2, 'o');
-		InitObject(GetNewMoving(), 120, 10, 3, 2, 'o');
-		InitObject(GetNewMoving(), 160, 10, 3, 2, 'o');
-		InitObject(GetNewMoving(), 175, 10, 3, 2, 'o');
+		initObject(GetNewMoving(), 25, 10, 3, 2, 'o');
+		initObject(GetNewMoving(), 80, 10, 3, 2, 'o');
+		initObject(GetNewMoving(), 65, 10, 3, 2, 'o');
+		initObject(GetNewMoving(), 120, 10, 3, 2, 'o');
+		initObject(GetNewMoving(), 160, 10, 3, 2, 'o');
+		initObject(GetNewMoving(), 175, 10, 3, 2, 'o');
 	}
 		
 		
 	if (level == 3){
 		brick = (TObject*) realloc( brick, sizeof(*brick) * brickLength );
-		InitObject(GetNewBrick(), 20, 20, 40, 5, '#');
-		InitObject(GetNewBrick(), 80, 20, 15, 5, '#');
-		InitObject(GetNewBrick(), 120, 15, 15, 10, '#');
-		InitObject(GetNewBrick(), 160, 10, 15, 15, '#');
+		initObject(GetNewBrick(), 20, 20, 40, 5, '#');
+		initObject(GetNewBrick(), 80, 20, 15, 5, '#');
+		initObject(GetNewBrick(), 120, 15, 15, 10, '#');
+		initObject(GetNewBrick(), 160, 10, 15, 15, '#');
 
-		InitObject(GetNewMoving(), 25, 10, 3, 2, 'o');
-		InitObject(GetNewMoving(), 50, 10, 3, 2, 'o');
-		InitObject(GetNewMoving(), 80, 10, 3, 2, 'o');
-		InitObject(GetNewMoving(), 90, 10, 3, 2, 'o');
-		InitObject(GetNewMoving(), 120, 10, 3, 2, 'o');
-		InitObject(GetNewMoving(), 130, 10, 3, 2, 'o');
+		initObject(GetNewMoving(), 25, 10, 3, 2, 'o');
+		initObject(GetNewMoving(), 50, 10, 3, 2, 'o');
+		initObject(GetNewMoving(), 80, 10, 3, 2, 'o');
+		initObject(GetNewMoving(), 90, 10, 3, 2, 'o');
+		initObject(GetNewMoving(), 120, 10, 3, 2, 'o');
+		initObject(GetNewMoving(), 130, 10, 3, 2, 'o');
 	}
 	maxLevel = 3;
 }
 
-void VertMoveObject (TObject *obj){
+void vertMoveObject (TObject *obj){
 	(*obj).isFly = TRUE;
 	(*obj).vertSpeed += 0.25;
-	SetObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
+	setObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
 	
 	for (int i = 0; i < brickLength; i++){
 		if (IsCollision( *obj, brick[i])){
@@ -201,7 +201,7 @@ void VertMoveObject (TObject *obj){
 			}
 			if ((brick[i].cType == '?') && (obj[0].vertSpeed < 0) && (obj == &mario)){
 				brick[i].cType = '-';
-				InitObject(GetNewMoving(), brick[i].x, brick[i].y-3, 3, 2, '$');
+				initObject(GetNewMoving(), brick[i].x, brick[i].y-3, 3, 2, '$');
 				moving[movingLength - 1].vertSpeed = -0.7;
 			}
 			(*obj).y -= ( *obj).vertSpeed;
@@ -212,7 +212,7 @@ void VertMoveObject (TObject *obj){
 					level =1;
 					system("color 2F");
 					Sleep(500);
-					CreateLevel(level);
+					createLevel(level);
 				}
 			}
 			break;
@@ -220,28 +220,28 @@ void VertMoveObject (TObject *obj){
 	}
 }
 
-void DeletedMoving(int i){
+void deletedMoving(int i){
 	movingLength--;
 	moving[i] = moving[movingLength];
 	moving = (TObject*) realloc( moving, sizeof(*moving) * movingLength );
 }
 
 
-void MarioCollision(){
+void marioCollision(){
 	for (int i = 0; i < movingLength; i++){
 		if (IsCollision (mario, moving[i])){
 			if (moving[i].cType == 'o'){
 				if ( (mario.isFly == TRUE) && (mario.vertSpeed > 0) && (mario.y + mario.height < moving[i].y + moving[i].height * 0.5)){
 					score += 50;
-					DeletedMoving(i);
+					deletedMoving(i);
 					i--;
 					continue;
 				}else 
-					PlayerDead();
+					playerDead();
 			}
 			if (moving[i].cType == '$'){
 				score += 100;
-				DeletedMoving(i);
+				deletedMoving(i);
 				i--;
 				continue;
 			}
@@ -260,7 +260,7 @@ void HorizonMoveMapObject (TObject *obj){
 	}	
 	if (obj[0].cType == 'o'){
 		TObject tmp = *obj;
-		VertMoveObject(&tmp);
+		vertMoveObject(&tmp);
 		if (tmp.isFly == TRUE){
 			obj[0].x -= obj[0].horizSpeed;
 			obj[0].horizSpeed = -obj[0].horizSpeed;		
@@ -311,12 +311,12 @@ TObject *GetNewBrick(){
 int main(){
 	
 	hide_cursor();
-	CreateLevel(level);
+	createLevel(level);
 	//system("color 9F");
 	
 	
 	do{
-		ClearMap();
+		clearMap();
 		
 		if ((mario.isFly == FALSE) && (GetKeyState(VK_SPACE) < 0)) {
 			mario.vertSpeed = -2.0;
@@ -329,38 +329,38 @@ int main(){
 		}
 		
 		if (mario.y > mapHeight) {
-			PlayerDead();
+			playerDead();
 		}
 		
-		VertMoveObject(&mario);
-		MarioCollision();
+		vertMoveObject(&mario);
+		marioCollision();
 		
 		for ( int i = 0; i <  brickLength; i++){
-			PutObjectOnMap(brick[i]);
+			putObjectOnMap(brick[i]);
 		}
 		
 		for ( int i = 0; i <  movingLength; i++){
-			VertMoveObject (moving + i);
+			vertMoveObject (moving + i);
 			HorizonMoveMapObject (moving + i);
 			if (moving[i].y > mapHeight){
-				DeletedMoving(i);
+				deletedMoving(i);
 				i--;
 				continue;
 			}
-			PutObjectOnMap (moving[i]);
+			putObjectOnMap (moving[i]);
 		}
-		PutObjectOnMap(mario);
-		PutObjectOnMap();
+		putObjectOnMap(mario);
+		putObjectOnMap();
 		
 		setCur(0,0);
-		ShowMap();
+		showMap();
 		
 		Sleep(10);
 	}
 	while (GetKeyState(VK_ESCAPE) >= 0);
-	SetObjectPos(&mario, 20,10);   
-    ClearMap();
-	PutObjectOnMap(mario);
-    ShowMap();
+	setObjectPos(&mario, 20,10);   
+    clearMap();
+	putObjectOnMap(mario);
+    showMap();
     return 0;
 }

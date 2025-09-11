@@ -10,25 +10,57 @@ typedef struct SObject{
 	float x,y;
 	float width, height;
 	float vertSpeed;
-	bool IsFly;
+	bool isFly;
 	char cType;
 	float horizSpeed;
 } TObject;
 
 char map[mapHeight][mapWidth+1];
+
 TObject mario;
-
 TObject *brick = NULL;
-int brickLength;
-
 TObject *moving = NULL;
+TObject *GetNewMoving();
+TObject *GetNewBrick();
+
+int brickLength;
 int movingLength;
 
 int level =1;
 int score;
 int maxLevel;
 
+void setCur(int x, int y);
+void hide_cursor();
+void ClearMap();
+void ShowMap();
+void PutObjectOnMap();
+void PutObjectOnMap(TObject obj);
+void SetObjectPos(TObject *obj, float xPos, float yPos);
+void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeight, char inType);
+void PlayerDead();
 void CreateLevel(int level);
+void VertMoveObject (TObject *obj);
+void DeletedMoving(int i);
+void MarioCollision();
+
+bool IsPosInMap(int x, int y);
+bool IsCollision(TObject o1, TObject o2);
+
+void setCur(int x, int y){
+	COORD coord;
+	coord.X = x;
+	coord.Y = y;
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+
+void hide_cursor(){
+	void* handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_CURSOR_INFO structCursorInfo;
+	GetConsoleCursorInfo(handle, &structCursorInfo);
+	structCursorInfo.bVisible = FALSE;
+	SetConsoleCursorInfo(handle, &structCursorInfo);
+}
 
 void ClearMap(){
     for(int i = 0; i<mapWidth; i++){
@@ -47,6 +79,31 @@ void ShowMap(){
     }
 }
 
+void PutObjectOnMap(){
+	char c[30];
+	sprintf(c, "score: %d", score);
+	int len = strlen(c);
+	for (int i = 0; i < len; i++){
+		map[1][i+5] = c[i];
+	}
+}
+
+void PutObjectOnMap(TObject obj){
+	int ix = (int)round(obj.x);
+	int iy = (int)round(obj.y);
+	int iWidth = (int)round(obj.width);
+	int iHeight = (int)round(obj.height);
+	
+	for (int i = ix; i < (ix + iWidth); i++){
+		for (int j = iy; j < (iy + iHeight); j++){
+			if (IsPosInMap(i,j)){
+				map[j][i] = obj.cType;
+			}
+	//map[iy][ix] = '@';
+		}
+	}
+}
+
 void SetObjectPos(TObject *obj, float xPos, float yPos){
 	(*obj).x = xPos;
 	(*obj).y = yPos;
@@ -61,29 +118,10 @@ void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
 	(*obj).horizSpeed = 0.2;
 }
 
-bool IsCollision(TObject o1, TObject o2){
-	return ((o1.x + o1.width) > o2.x) && (o1.x < (o2.x + o2.width)) &&
-		   ((o1.y + o1.height) >o2.y) && (o1.y < (o2.y + o2.height));
-}	
-TObject *GetNewMoving(){
-	movingLength++;
-	moving = (TObject*) realloc( moving, sizeof(TObject) * movingLength); //sizeof(brick)
-	return moving + movingLength - 1;
-}
-
-TObject *GetNewBrick(){
-	brickLength++;
-	brick = (TObject*) realloc( brick, sizeof(TObject) * brickLength); //sizeof(brick) 
-	return brick + brickLength - 1;
-}
-
-void PutObjectOnMap(){
-	char c[30];
-	sprintf(c, "score: %d", score);
-	int len = strlen(c);
-	for (int i = 0; i < len; i++){
-		map[1][i+5] = c[i];
-	}
+void PlayerDead(){
+    system("color 4F");
+    Sleep(500);
+    CreateLevel(level);   // теперь компилятор знает про CreateLevel
 }
 
 void CreateLevel(int level){
@@ -151,17 +189,15 @@ void CreateLevel(int level){
 	maxLevel = 3;
 }
 
-
-
 void VertMoveObject (TObject *obj){
-	(*obj).IsFly = TRUE;
+	(*obj).isFly = TRUE;
 	(*obj).vertSpeed += 0.25;
 	SetObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
 	
 	for (int i = 0; i < brickLength; i++){
 		if (IsCollision( *obj, brick[i])){
 			if (obj[0].vertSpeed > 0){
-				obj[0].IsFly = FALSE;
+				obj[0].isFly = FALSE;
 			}
 			if ((brick[i].cType == '?') && (obj[0].vertSpeed < 0) && (obj == &mario)){
 				brick[i].cType = '-';
@@ -190,17 +226,12 @@ void DeletedMoving(int i){
 	moving = (TObject*) realloc( moving, sizeof(*moving) * movingLength );
 }
 
-void PlayerDead(){
-    system("color 4F");
-    Sleep(500);
-    CreateLevel(level);   // теперь компилятор знает про CreateLevel
-}
 
 void MarioCollision(){
 	for (int i = 0; i < movingLength; i++){
 		if (IsCollision (mario, moving[i])){
 			if (moving[i].cType == 'o'){
-				if ( (mario.IsFly == TRUE) && (mario.vertSpeed > 0) && (mario.y + mario.height < moving[i].y + moving[i].height * 0.5)){
+				if ( (mario.isFly == TRUE) && (mario.vertSpeed > 0) && (mario.y + mario.height < moving[i].y + moving[i].height * 0.5)){
 					score += 50;
 					DeletedMoving(i);
 					i--;
@@ -230,37 +261,11 @@ void HorizonMoveMapObject (TObject *obj){
 	if (obj[0].cType == 'o'){
 		TObject tmp = *obj;
 		VertMoveObject(&tmp);
-		if (tmp.IsFly == TRUE){
+		if (tmp.isFly == TRUE){
 			obj[0].x -= obj[0].horizSpeed;
 			obj[0].horizSpeed = -obj[0].horizSpeed;		
 		}
 	}
-}
-
-bool IsPosInMap(int x, int y){
-	return ( (x >= 0) && (x < mapWidth) && (y >= 0) && (y < mapHeight) );
-}
-
-void PutObjectOnMap(TObject obj){
-	int ix = (int)round(obj.x);
-	int iy = (int)round(obj.y);
-	int iWidth = (int)round(obj.width);
-	int iHeight = (int)round(obj.height);
-	
-	for (int i = ix; i < (ix + iWidth); i++){
-		for (int j = iy; j < (iy + iHeight); j++){
-			if (IsPosInMap(i,j)){
-				map[j][i] = obj.cType;
-			}
-	//map[iy][ix] = '@';
-		}
-	}
-}
-void setCur(int x, int y){
-	COORD coord;
-	coord.X = x;
-	coord.Y = y;
-	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
 void HorizonMoveMap(float dx){
@@ -281,13 +286,27 @@ void HorizonMoveMap(float dx){
 	}
 }
 
-void hide_cursor(){
-	void* handle = GetStdHandle(STD_OUTPUT_HANDLE);
-	CONSOLE_CURSOR_INFO structCursorInfo;
-	GetConsoleCursorInfo(handle, &structCursorInfo);
-	structCursorInfo.bVisible = FALSE;
-	SetConsoleCursorInfo(handle, &structCursorInfo);
+bool IsPosInMap(int x, int y){
+	return ( (x >= 0) && (x < mapWidth) && (y >= 0) && (y < mapHeight) );
 }
+
+bool IsCollision(TObject o1, TObject o2){
+	return ((o1.x + o1.width) > o2.x) && (o1.x < (o2.x + o2.width)) &&
+		   ((o1.y + o1.height) >o2.y) && (o1.y < (o2.y + o2.height));
+}	
+
+TObject *GetNewMoving(){
+	movingLength++;
+	moving = (TObject*) realloc( moving, sizeof(TObject) * movingLength); //sizeof(brick)
+	return moving + movingLength - 1;
+}
+
+TObject *GetNewBrick(){
+	brickLength++;
+	brick = (TObject*) realloc( brick, sizeof(TObject) * brickLength); //sizeof(brick) 
+	return brick + brickLength - 1;
+}
+
 
 int main(){
 	
@@ -299,7 +318,7 @@ int main(){
 	do{
 		ClearMap();
 		
-		if ((mario.IsFly == FALSE) && (GetKeyState(VK_SPACE) < 0)) {
+		if ((mario.isFly == FALSE) && (GetKeyState(VK_SPACE) < 0)) {
 			mario.vertSpeed = -2.0;
 		}
 		if (GetKeyState('A') < 0){

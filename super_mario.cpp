@@ -109,17 +109,17 @@ void putObjectOnMap(GameState& st, TObject obj){
 
 
 void setObjectPos(TObject *obj, float xPos, float yPos){
-	(*obj).x = xPos;
-	(*obj).y = yPos;
+	obj->x = xPos;
+	obj->y = yPos;
 }
 
 void initObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeight, char inType){
 	setObjectPos(obj, xPos, yPos);
-	(*obj).width = oWidth;
-	(*obj).height = oHeight;
-	(*obj).vertSpeed = 0;
-	(*obj).cType = inType;
-	(*obj).horizSpeed = 0.2;
+    obj->width = oWidth;
+    obj->height = oHeight;
+    obj->vertSpeed = 0;
+    obj->cType = inType;
+    obj->horizSpeed = 0.2f;
 }
 
 void playerDead(GameState& st){
@@ -192,22 +192,22 @@ void createLevel(GameState& st, int level){
 }
 
 void vertMoveObject (GameState& st, TObject *obj){
-	(*obj).isFly = TRUE;
-	(*obj).vertSpeed += 0.25;
-	setObjectPos(obj, (*obj).x, (*obj).y + (*obj).vertSpeed);
+	obj->isFly = true;
+	obj->vertSpeed += 0.25f;
+	setObjectPos(obj, obj->x, obj->y + obj->vertSpeed);
 	
 	for (int i = 0; i < st.brickLength; i++){
 		if (IsCollision( *obj, st.brick[i])){
-			if (obj[0].vertSpeed > 0){
-				obj[0].isFly = FALSE;
+			if (obj->vertSpeed > 0){
+				obj->isFly = false;
 			}
-			if ((st.brick[i].cType == '?') && (obj[0].vertSpeed < 0) && (obj == &st.mario)){
+			if ((st.brick[i].cType == '?') && (obj->vertSpeed < 0) && (obj == &st.mario)){
 				st.brick[i].cType = '-';
 				initObject(GetNewMoving(st), st.brick[i].x, st.brick[i].y - 3, 3, 2, '$');
-				st.moving[st.movingLength - 1].vertSpeed = -0.7;
+				st.moving[st.movingLength - 1].vertSpeed = -0.7f; //зачем f
 			}
-			(*obj).y -= ( *obj).vertSpeed;
-			(*obj).vertSpeed = 0;
+			obj->y -= obj->vertSpeed;;
+			obj->vertSpeed = 0;;
 
 			if (st.brick[i].cType == '+'){
 				if (st.level > st.maxLevel){
@@ -253,11 +253,11 @@ void marioCollision(GameState& st){
 }
 
 void HorizonMoveMapObject (GameState& st, TObject *obj){
-	obj[0].x += obj[0].horizSpeed;	
+	obj->x += obj->horizSpeed;	
 	for (int i = 0; i < st.brickLength; i++){
 		if ( IsCollision(obj[0], st.brick[i])){
-			obj[0].x -= obj[0].horizSpeed;
-			obj[0].horizSpeed = -obj[0].horizSpeed;
+			obj->x -= obj->horizSpeed;
+			obj->horizSpeed = -obj->horizSpeed;
 			return;
 		}	
 	}	
@@ -265,8 +265,8 @@ void HorizonMoveMapObject (GameState& st, TObject *obj){
 		TObject tmp = *obj;
 		vertMoveObject(st, &tmp);
 		if (tmp.isFly == TRUE){
-			obj[0].x -= obj[0].horizSpeed;
-			obj[0].horizSpeed = -obj[0].horizSpeed;		
+			obj->x -= obj->horizSpeed;
+			obj->horizSpeed = -obj->horizSpeed;		
 		}
 	}
 }
@@ -321,7 +321,7 @@ int main(){
 		clearMap(state);
 		
 		if ((state.mario.isFly == FALSE) && (GetKeyState(VK_SPACE) < 0)) {
-			state.mario.vertSpeed = -2.0;
+			state.mario.vertSpeed = -2.0f;
 		}
 		if (GetKeyState('A') < 0){
 				HorizonMoveMap(state, 1);

@@ -23,10 +23,11 @@ struct GameState {
 	TObject *moving = nullptr;
 	int brickLength;
 	int movingLength;
-	int level =1;
 	int score = 0;
 	int maxLevel = 3;
 };
+
+int level = 1; 
 
 void setCur(int x, int y);
 void hide_cursor();
@@ -119,13 +120,13 @@ void initObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
     obj->height = oHeight;
     obj->vertSpeed = 0;
     obj->cType = inType;
-    obj->horizSpeed = 0.2f;
+    obj->horizSpeed = 0.2;
 }
 
 void playerDead(GameState& st){
     system("color 4F");
     Sleep(500);
-    createLevel(st, st.level);
+    createLevel(st, level);
 }
 
 void createLevel(GameState& st, int level){
@@ -193,7 +194,7 @@ void createLevel(GameState& st, int level){
 
 void vertMoveObject (GameState& st, TObject *obj){
 	obj->isFly = true;
-	obj->vertSpeed += 0.25f;
+	obj->vertSpeed += 0.05;
 	setObjectPos(obj, obj->x, obj->y + obj->vertSpeed);
 	
 	for (int i = 0; i < st.brickLength; i++){
@@ -204,18 +205,17 @@ void vertMoveObject (GameState& st, TObject *obj){
 			if ((st.brick[i].cType == '?') && (obj->vertSpeed < 0) && (obj == &st.mario)){
 				st.brick[i].cType = '-';
 				initObject(GetNewMoving(st), st.brick[i].x, st.brick[i].y - 3, 3, 2, '$');
-				st.moving[st.movingLength - 1].vertSpeed = -0.7f; //зачем f
+				st.moving[st.movingLength - 1].vertSpeed = -0.7;
 			}
 			obj->y -= obj->vertSpeed;;
 			obj->vertSpeed = 0;;
 
 			if (st.brick[i].cType == '+'){
-				if (st.level > st.maxLevel){
-					st.level =1;
+				level++;
+				if (level > st.maxLevel) level = 1;
 					system("color 2F");
 					Sleep(500);
-					createLevel(st, st.level);
-				}
+					createLevel(st, level);
 			}
 			break;
 		}
@@ -313,7 +313,7 @@ TObject* GetNewBrick(GameState& st) {
 int main(){
     GameState state;
 	hide_cursor();
-	createLevel(state, state.level);
+	createLevel(state, level);
 	//system("color 9F");
 	
 	
@@ -321,7 +321,7 @@ int main(){
 		clearMap(state);
 		
 		if ((state.mario.isFly == FALSE) && (GetKeyState(VK_SPACE) < 0)) {
-			state.mario.vertSpeed = -2.0f;
+			state.mario.vertSpeed = -1.0;
 		}
 		if (GetKeyState('A') < 0){
 				HorizonMoveMap(state, 1);

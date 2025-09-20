@@ -19,9 +19,9 @@ typedef struct SObject{
 struct GameState {
 	char map[mapHeight][mapWidth+1];
 	TObject mario;
-	TObject *brick = nullptr;
+	TObject *bricks = nullptr;
 	TObject *moving = nullptr;
-	int brickLength;
+	int bricksLength;
 	int movingLength;
 	int score = 0;
 	int maxLevel = 3;
@@ -45,7 +45,7 @@ void marioCollision(GameState& st);
 void HorizonMoveMapObject (GameState& st, TObject *obj);
 void HorizonMoveMap(GameState& st, float dx);
 
-TObject* GetNewBrick(GameState& st);
+TObject* GetNewbricks(GameState& st);
 TObject* GetNewMoving(GameState& st);
 
 bool IsPosInMap(int x, int y);
@@ -132,8 +132,8 @@ void playerDead(GameState& st){
 void createLevel(GameState& st, int level){
 	system("color 9F");
 	
-    st.brickLength = 0;
-    st.brick = (TObject*)realloc(st.brick, 0);
+    st.bricksLength = 0;
+    st.bricks = (TObject*)realloc(st.bricks, 0);
     st.movingLength = 0;
     st.moving = (TObject*)realloc(st.moving, 0);
 	
@@ -141,31 +141,31 @@ void createLevel(GameState& st, int level){
 	st.score = 0;
 	
 	if (level == 1){
-		initObject(GetNewBrick(st), 20, 20, 40, 5, '#');
-			initObject(GetNewBrick(st), 30, 10, 5, 3, '?');
-			initObject(GetNewBrick(st), 50, 10, 5, 3, '?');
-		initObject(GetNewBrick(st), 60, 15, 40, 10, '#');
-			initObject(GetNewBrick(st), 60, 5, 10, 3, '-');
-			initObject(GetNewBrick(st), 70, 5, 5, 3, '?');
-			initObject(GetNewBrick(st), 75, 5, 5, 3, '-');
-			initObject(GetNewBrick(st), 80, 5, 5, 3, '?');
-			initObject(GetNewBrick(st), 85, 5, 10, 3, '-');
-        initObject(GetNewBrick(st), 100, 20, 20, 5, '#');
-        initObject(GetNewBrick(st), 120, 15, 10, 10, '#');
-        initObject(GetNewBrick(st), 150, 20, 40, 5, '#');
-        initObject(GetNewBrick(st), 210, 15, 10, 10, '+');
+		initObject(GetNewbricks(st), 20, 20, 40, 5, '#');
+			initObject(GetNewbricks(st), 30, 10, 5, 3, '?');
+			initObject(GetNewbricks(st), 50, 10, 5, 3, '?');
+		initObject(GetNewbricks(st), 60, 15, 40, 10, '#');
+			initObject(GetNewbricks(st), 60, 5, 10, 3, '-');
+			initObject(GetNewbricks(st), 70, 5, 5, 3, '?');
+			initObject(GetNewbricks(st), 75, 5, 5, 3, '-');
+			initObject(GetNewbricks(st), 80, 5, 5, 3, '?');
+			initObject(GetNewbricks(st), 85, 5, 10, 3, '-');
+        initObject(GetNewbricks(st), 100, 20, 20, 5, '#');
+        initObject(GetNewbricks(st), 120, 15, 10, 10, '#');
+        initObject(GetNewbricks(st), 150, 20, 40, 5, '#');
+        initObject(GetNewbricks(st), 210, 15, 10, 10, '+');
 		
 		initObject(GetNewMoving(st), 25, 10, 3, 2, 'o');
 		initObject(GetNewMoving(st), 80, 10, 3, 2, 'o');
 	}
 		
 	if (level == 2){
-        initObject(GetNewBrick(st), 20, 20, 40, 5, '#');
-        initObject(GetNewBrick(st), 60, 15, 10, 10, '#');
-        initObject(GetNewBrick(st), 80, 20, 20, 5, '#');
-        initObject(GetNewBrick(st), 120, 15, 10, 10, '#');
-        initObject(GetNewBrick(st), 150, 20, 40, 5, '#');
-        initObject(GetNewBrick(st), 210, 15, 10, 10, '+');
+        initObject(GetNewbricks(st), 20, 20, 40, 5, '#');
+        initObject(GetNewbricks(st), 60, 15, 10, 10, '#');
+        initObject(GetNewbricks(st), 80, 20, 20, 5, '#');
+        initObject(GetNewbricks(st), 120, 15, 10, 10, '#');
+        initObject(GetNewbricks(st), 150, 20, 40, 5, '#');
+        initObject(GetNewbricks(st), 210, 15, 10, 10, '+');
 
         initObject(GetNewMoving(st), 25, 10, 3, 2, 'o');
         initObject(GetNewMoving(st), 80, 10, 3, 2, 'o');
@@ -177,10 +177,10 @@ void createLevel(GameState& st, int level){
 		
 		
 	if (level == 3){
-        initObject(GetNewBrick(st), 20, 20, 40, 5, '#');
-        initObject(GetNewBrick(st), 80, 20, 15, 5, '#');
-        initObject(GetNewBrick(st), 120, 15, 15, 10, '#');
-        initObject(GetNewBrick(st), 160, 10, 15, 15, '#');
+        initObject(GetNewbricks(st), 20, 20, 40, 5, '#');
+        initObject(GetNewbricks(st), 80, 20, 15, 5, '#');
+        initObject(GetNewbricks(st), 120, 15, 15, 10, '#');
+        initObject(GetNewbricks(st), 160, 10, 15, 15, '#');
 
         initObject(GetNewMoving(st), 25, 10, 3, 2, 'o');
         initObject(GetNewMoving(st), 50, 10, 3, 2, 'o');
@@ -197,20 +197,20 @@ void vertMoveObject (GameState& st, TObject *obj){
 	obj->vertSpeed += 0.05;
 	setObjectPos(obj, obj->x, obj->y + obj->vertSpeed);
 	
-	for (int i = 0; i < st.brickLength; i++){
-		if (IsCollision( *obj, st.brick[i])){
+	for (int i = 0; i < st.bricksLength; i++){
+		if (IsCollision( *obj, st.bricks[i])){
 			if (obj->vertSpeed > 0){
 				obj->isFly = false;
 			}
-			if ((st.brick[i].cType == '?') && (obj->vertSpeed < 0) && (obj == &st.mario)){
-				st.brick[i].cType = '-';
-				initObject(GetNewMoving(st), st.brick[i].x, st.brick[i].y - 3, 3, 2, '$');
+			if ((st.bricks[i].cType == '?') && (obj->vertSpeed < 0) && (obj == &st.mario)){
+				st.bricks[i].cType = '-';
+				initObject(GetNewMoving(st), st.bricks[i].x, st.bricks[i].y - 3, 3, 2, '$');
 				st.moving[st.movingLength - 1].vertSpeed = -0.7;
 			}
 			obj->y -= obj->vertSpeed;;
 			obj->vertSpeed = 0;;
 
-			if (st.brick[i].cType == '+'){
+			if (st.bricks[i].cType == '+'){
 				level++;
 				if (level > st.maxLevel) level = 1;
 					system("color 2F");
@@ -254,8 +254,8 @@ void marioCollision(GameState& st){
 
 void HorizonMoveMapObject (GameState& st, TObject *obj){
 	obj->x += obj->horizSpeed;	
-	for (int i = 0; i < st.brickLength; i++){
-		if ( IsCollision(obj[0], st.brick[i])){
+	for (int i = 0; i < st.bricksLength; i++){
+		if ( IsCollision(obj[0], st.bricks[i])){
 			obj->x -= obj->horizSpeed;
 			obj->horizSpeed = -obj->horizSpeed;
 			return;
@@ -273,16 +273,16 @@ void HorizonMoveMapObject (GameState& st, TObject *obj){
 
 void HorizonMoveMap(GameState& st, float dx){
 	st.mario.x -= dx;
-	for (int i = 0; i < st.brickLength; i++){
-		if (IsCollision(st.mario, st.brick[i])){
+	for (int i = 0; i < st.bricksLength; i++){
+		if (IsCollision(st.mario, st.bricks[i])){
 			st.mario.x += dx;
 			return;
 		}
 	}
 	st.mario.x += dx;
 	
-	for (int i = 0; i < st.brickLength; i++){
-		st.brick[i].x += dx;
+	for (int i = 0; i < st.bricksLength; i++){
+		st.bricks[i].x += dx;
 	}
 	for (int i = 0; i < st.movingLength; i++){
 		st.moving[i].x += dx;
@@ -304,10 +304,10 @@ TObject* GetNewMoving(GameState& st) {
     return st.moving + st.movingLength - 1;
 }
 
-TObject* GetNewBrick(GameState& st) {
-    st.brickLength++;
-    st.brick = (TObject*)realloc(st.brick, sizeof(TObject) * st.brickLength);
-    return st.brick + st.brickLength - 1;
+TObject* GetNewbricks(GameState& st) {
+    st.bricksLength++;
+    st.bricks = (TObject*)realloc(st.bricks, sizeof(TObject) * st.bricksLength);
+    return st.bricks + st.bricksLength - 1;
 }
 
 int main(){
@@ -337,8 +337,8 @@ int main(){
 		vertMoveObject(state, &state.mario);
 		marioCollision(state);
 		
-		for ( int i = 0; i < state.brickLength; i++){
-			putObjectOnMap(state, state.brick[i]);
+		for ( int i = 0; i < state.bricksLength; i++){
+			putObjectOnMap(state, state.bricks[i]);
 		}
 		
 		for ( int i = 0; i < state.movingLength; i++){

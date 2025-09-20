@@ -51,6 +51,63 @@ TObject* GetNewMoving(GameState& st);
 bool IsPosInMap(int x, int y);
 bool IsCollision(TObject o1, TObject o2);
 
+
+
+int main(){
+    GameState state;
+	hide_cursor();
+	createLevel(state, level);
+	//system("color 9F");
+	
+	
+	do{
+		clearMap(state);
+		
+		if ((state.mario.isFly == FALSE) && (GetKeyState(VK_SPACE) < 0)) {
+			state.mario.vertSpeed = -1.0;
+		}
+		if (GetKeyState('A') < 0){
+				HorizonMoveMap(state, 1);
+		}
+		if (GetKeyState('D') < 0){
+				HorizonMoveMap(state,-1);
+		}
+		
+		if (state.mario.y > mapHeight) {
+			playerDead(state);
+		}
+		
+		vertMoveObject(state, &state.mario);
+		marioCollision(state);
+		
+		for ( int i = 0; i < state.bricksCount; i++){
+			putObjectOnMap(state, state.bricks[i]);
+		}
+		
+		for ( int i = 0; i < state.movingCount; i++){
+			vertMoveObject (state, state.moving + i);
+			HorizonMoveMapObject (state, state.moving + i);
+			if (state.moving[i].y > mapHeight){
+				deletedMoving(state, i);
+				i--;
+				continue;
+			}
+			putObjectOnMap (state, state.moving[i]);
+		}
+		putObjectOnMap(state, state.mario);
+		putObjectOnMap(state);
+		
+		setCur(0,0);
+		showMap(state);
+		
+		Sleep(10);
+	}
+	while (GetKeyState(VK_ESCAPE) >= 0);
+	
+    return 0;
+}
+
+
 void setCur(int x, int y){
 	COORD coord;
 	coord.X = x;
@@ -308,58 +365,4 @@ TObject* GetNewbricks(GameState& st) {
     st.bricksCount++;
     st.bricks = (TObject*)realloc(st.bricks, sizeof(TObject) * st.bricksCount);
     return st.bricks + st.bricksCount - 1;
-}
-
-int main(){
-    GameState state;
-	hide_cursor();
-	createLevel(state, level);
-	//system("color 9F");
-	
-	
-	do{
-		clearMap(state);
-		
-		if ((state.mario.isFly == FALSE) && (GetKeyState(VK_SPACE) < 0)) {
-			state.mario.vertSpeed = -1.0;
-		}
-		if (GetKeyState('A') < 0){
-				HorizonMoveMap(state, 1);
-		}
-		if (GetKeyState('D') < 0){
-				HorizonMoveMap(state,-1);
-		}
-		
-		if (state.mario.y > mapHeight) {
-			playerDead(state);
-		}
-		
-		vertMoveObject(state, &state.mario);
-		marioCollision(state);
-		
-		for ( int i = 0; i < state.bricksCount; i++){
-			putObjectOnMap(state, state.bricks[i]);
-		}
-		
-		for ( int i = 0; i < state.movingCount; i++){
-			vertMoveObject (state, state.moving + i);
-			HorizonMoveMapObject (state, state.moving + i);
-			if (state.moving[i].y > mapHeight){
-				deletedMoving(state, i);
-				i--;
-				continue;
-			}
-			putObjectOnMap (state, state.moving[i]);
-		}
-		putObjectOnMap(state, state.mario);
-		putObjectOnMap(state);
-		
-		setCur(0,0);
-		showMap(state);
-		
-		Sleep(10);
-	}
-	while (GetKeyState(VK_ESCAPE) >= 0);
-	
-    return 0;
 }

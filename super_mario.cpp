@@ -7,14 +7,14 @@
 #define mapWidth 120
 #define mapHeight 30
 
-typedef struct SObject{
+struct TObject{
 	float x,y;
 	float width, height;
 	float vertSpeed;
 	float horizSpeed;
 	bool isFly;
 	char cType;
-} TObject;
+};
 
 struct GameState {
 	char map[mapHeight][mapWidth+1];

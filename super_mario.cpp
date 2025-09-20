@@ -21,8 +21,8 @@ struct GameState {
 	TObject mario;
 	TObject *bricks = nullptr;
 	TObject *moving = nullptr;
-	int bricksLength;
-	int movingLength;
+	int bricksCount;
+	int movingCount;
 	int score = 0;
 	int maxLevel = 3;
 };
@@ -132,9 +132,9 @@ void playerDead(GameState& st){
 void createLevel(GameState& st, int level){
 	system("color 9F");
 	
-    st.bricksLength = 0;
+    st.bricksCount = 0;
     st.bricks = (TObject*)realloc(st.bricks, 0);
-    st.movingLength = 0;
+    st.movingCount = 0;
     st.moving = (TObject*)realloc(st.moving, 0);
 	
 	initObject(&st.mario, 39, 10, 3, 3, '@');
@@ -197,7 +197,7 @@ void vertMoveObject (GameState& st, TObject *obj){
 	obj->vertSpeed += 0.05;
 	setObjectPos(obj, obj->x, obj->y + obj->vertSpeed);
 	
-	for (int i = 0; i < st.bricksLength; i++){
+	for (int i = 0; i < st.bricksCount; i++){
 		if (IsCollision( *obj, st.bricks[i])){
 			if (obj->vertSpeed > 0){
 				obj->isFly = false;
@@ -205,7 +205,7 @@ void vertMoveObject (GameState& st, TObject *obj){
 			if ((st.bricks[i].cType == '?') && (obj->vertSpeed < 0) && (obj == &st.mario)){
 				st.bricks[i].cType = '-';
 				initObject(GetNewMoving(st), st.bricks[i].x, st.bricks[i].y - 3, 3, 2, '$');
-				st.moving[st.movingLength - 1].vertSpeed = -0.7;
+				st.moving[st.movingCount - 1].vertSpeed = -0.7;
 			}
 			obj->y -= obj->vertSpeed;;
 			obj->vertSpeed = 0;;
@@ -223,14 +223,14 @@ void vertMoveObject (GameState& st, TObject *obj){
 }
 
 void deletedMoving(GameState& st, int i){
-    st.movingLength--;
-    st.moving[i] = st.moving[st.movingLength];
-    st.moving = (TObject*)realloc(st.moving, sizeof(TObject) * st.movingLength);
+    st.movingCount--;
+    st.moving[i] = st.moving[st.movingCount];
+    st.moving = (TObject*)realloc(st.moving, sizeof(TObject) * st.movingCount);
 }
 
 
 void marioCollision(GameState& st){
-    for (int i = 0; i < st.movingLength; i++) {
+    for (int i = 0; i < st.movingCount; i++) {
         if (IsCollision(st.mario, st.moving[i])) {
             if (st.moving[i].cType == 'o') {
                 if ((st.mario.isFly == TRUE) && (st.mario.vertSpeed > 0) &&
@@ -254,7 +254,7 @@ void marioCollision(GameState& st){
 
 void HorizonMoveMapObject (GameState& st, TObject *obj){
 	obj->x += obj->horizSpeed;	
-	for (int i = 0; i < st.bricksLength; i++){
+	for (int i = 0; i < st.bricksCount; i++){
 		if ( IsCollision(obj[0], st.bricks[i])){
 			obj->x -= obj->horizSpeed;
 			obj->horizSpeed = -obj->horizSpeed;
@@ -273,7 +273,7 @@ void HorizonMoveMapObject (GameState& st, TObject *obj){
 
 void HorizonMoveMap(GameState& st, float dx){
 	st.mario.x -= dx;
-	for (int i = 0; i < st.bricksLength; i++){
+	for (int i = 0; i < st.bricksCount; i++){
 		if (IsCollision(st.mario, st.bricks[i])){
 			st.mario.x += dx;
 			return;
@@ -281,10 +281,10 @@ void HorizonMoveMap(GameState& st, float dx){
 	}
 	st.mario.x += dx;
 	
-	for (int i = 0; i < st.bricksLength; i++){
+	for (int i = 0; i < st.bricksCount; i++){
 		st.bricks[i].x += dx;
 	}
-	for (int i = 0; i < st.movingLength; i++){
+	for (int i = 0; i < st.movingCount; i++){
 		st.moving[i].x += dx;
 	}
 }
@@ -299,15 +299,15 @@ bool IsCollision(TObject o1, TObject o2){
 }	
 
 TObject* GetNewMoving(GameState& st) {
-    st.movingLength++;
-    st.moving = (TObject*)realloc(st.moving, sizeof(TObject) * st.movingLength);
-    return st.moving + st.movingLength - 1;
+    st.movingCount++;
+    st.moving = (TObject*)realloc(st.moving, sizeof(TObject) * st.movingCount);
+    return st.moving + st.movingCount - 1;
 }
 
 TObject* GetNewbricks(GameState& st) {
-    st.bricksLength++;
-    st.bricks = (TObject*)realloc(st.bricks, sizeof(TObject) * st.bricksLength);
-    return st.bricks + st.bricksLength - 1;
+    st.bricksCount++;
+    st.bricks = (TObject*)realloc(st.bricks, sizeof(TObject) * st.bricksCount);
+    return st.bricks + st.bricksCount - 1;
 }
 
 int main(){
@@ -337,11 +337,11 @@ int main(){
 		vertMoveObject(state, &state.mario);
 		marioCollision(state);
 		
-		for ( int i = 0; i < state.bricksLength; i++){
+		for ( int i = 0; i < state.bricksCount; i++){
 			putObjectOnMap(state, state.bricks[i]);
 		}
 		
-		for ( int i = 0; i < state.movingLength; i++){
+		for ( int i = 0; i < state.movingCount; i++){
 			vertMoveObject (state, state.moving + i);
 			HorizonMoveMapObject (state, state.moving + i);
 			if (state.moving[i].y > mapHeight){

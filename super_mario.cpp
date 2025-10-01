@@ -12,6 +12,7 @@ struct TObject{
 	float horizSpeed;
 	bool isFly;
 	char ctype;
+	int jumpCooldown; 
 };
 
 const char BRICK = '#';
@@ -21,6 +22,9 @@ const char FULL_BOX = '?';
 const char MARIO = '@';
 const char MONEY = '$';
 const char WIN_BRICK = '+';
+const char JUMP_ENEMY = '&';
+const char THORN = '^';
+
 
 /*struct GameState {
 	char map[mapHeight][mapWidth+1];
@@ -313,6 +317,7 @@ void initObj(
     obj->vertSpeed = 0;
     obj->ctype = inType;
     obj->horizSpeed = 0.2;
+	obj->jumpCooldown = 0;
 }
 
 void rerunLevel(
@@ -372,11 +377,24 @@ void createCurrentLevel(
 			initObj(&bricks[11], 150, 20, 40, 5, BRICK);
 			initObj(&bricks[12], 210, 15, 10, 10, WIN_BRICK);
 			
-			movingsCount = 2;
+			movingsCount = 7;
 			movings = new TObject[movingsCount];
 			
 			initObj(&movings[0], 25, 10, 3, 2, ENEMY);
 			initObj(&movings[1], 80, 10, 3, 2, ENEMY);
+			
+			initObj(&movings[2], 50, 15, 3, 2, JUMP_ENEMY);
+			movings[2].vertSpeed = -0.5;
+			
+			initObj(&movings[3], 105, 18, 3, 2, JUMP_ENEMY);
+			movings[3].vertSpeed = -0.5;
+			
+			initObj(&movings[4], 155, 18, 3, 2, JUMP_ENEMY);
+	        movings[4].vertSpeed = -0.5;
+			
+			initObj(&movings[5], 65, 14, 3, 2, THORN);			
+			initObj(&movings[6], 90, 14, 3, 2, THORN);
+
 			break;
 		case 2:
 			bricksCount = 6;
@@ -463,9 +481,18 @@ void moveObjVertically (
 					'$');
 				movings[movingsCount - 1].vertSpeed = -0.7;
 			}
-			obj->y -= obj->vertSpeed;;
-			obj->vertSpeed = 0;;
-
+			obj->y -= obj->vertSpeed;
+			obj->vertSpeed = 0;
+			
+            if (obj->ctype == JUMP_ENEMY && !obj->isFly) {
+                if (obj->jumpCooldown <= 0) {
+                    obj->vertSpeed = -0.6;   // старт прыжка
+                    obj->jumpCooldown = 50;  // задержка до следующего (50 кадров)
+                } else {
+                    obj->jumpCooldown--;     // ждём окончания таймера
+                }
+            }
+			
 			if (bricks[i].ctype == WIN_BRICK){
 				currentLevel++;
 				if (currentLevel > maxLevel){
@@ -500,23 +527,39 @@ void checkMarioCollision(
 ){
     for (int i = 0; i < movingsCount; i++) {
         if (isCollision(&mario, &movings[i])) {
-            if (movings[i].ctype == ENEMY) {
-                if (					mario.isFly == true && 
+            if (movings[i].ctype == ENEMY || movings[i].ctype == JUMP_ENEMY) {
+                if (mario.isFly == true && 
 					mario.vertSpeed > 0 &&
 					mario.y + mario.height < movings[i].y + movings[i].height * 0.5
 				){
-					score += 50;
+					if (movings[i].ctype == ENEMY) {
+                        score += 50;
+                    } else if (movings[i].ctype == JUMP_ENEMY) {
+                        score += 75;
+                    }
                     deleteMovings(i, movings, movingsCount);
                     i--;
                     continue;
                 }
-                else rerunLevel(
-					mario, 
-					bricks, bricksCount, 
-					movings, movingsCount, 
-					currentLevel,  
-					score);
+                else {
+					rerunLevel(
+						mario, 
+						bricks, bricksCount, 
+						movings, movingsCount, 
+						currentLevel,  
+						score);
+					return;
+				}	
             }
+			if (movings[i].ctype == THORN) {
+                rerunLevel(
+                    mario, 
+                    bricks, bricksCount, 
+                    movings, movingsCount, 
+                    currentLevel,  
+                    score);
+                return; 
+			}
             if (movings[i].ctype == MONEY) {
                 score += 100;
                 deleteMovings(i, movings, movingsCount);
@@ -545,7 +588,7 @@ void moveObjHorizontally (
 			return;
 		}	
 	}	
-	if (obj->ctype == ENEMY){
+	if (obj->ctype == ENEMY || obj->ctype == JUMP_ENEMY){
 		TObject tmp = *obj;
 		moveObjVertically(
 			&tmp, 
